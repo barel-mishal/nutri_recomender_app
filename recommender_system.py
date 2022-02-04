@@ -1,3 +1,4 @@
+from ctypes import Union
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -6,6 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import hebrew_tokenizer as ht
 from wordcloud import WordCloud
 from bidi.algorithm import get_display  # pip install python-bidi
+from typing import Union
 
 ISRAELI_DATA_PATH = "csvs/israeli_data.csv"
 MACRO_NUTRIENTS = ['protein', 'total_fat', 'carbohydrates']
@@ -30,7 +32,7 @@ def tokenize(hebrew_text):
     ]
 
 
-def get_recommendations(data, food_item, cosine_sim, indices):
+def get_recommendations(data, food_item, cosine_sim, indices) -> pd.Series:  
     # Get the index of the food item
     idx = indices[food_item]
 
@@ -41,7 +43,7 @@ def get_recommendations(data, food_item, cosine_sim, indices):
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
 
     # Get the scores of the 30 most similar food items
-    sim_scores = sim_scores[1:30]
+    sim_scores = sim_scores[1:5]
 
     # Get the food items indices
     foods_indices = [i[0] for i in sim_scores]
@@ -61,8 +63,8 @@ def get_recommendations(data, food_item, cosine_sim, indices):
 #     plt.show()
 
 
-def find_food_item(data):
-    food_item = input("Please enter a food item: ")  # Example: חלב 3% שומן, תנובה, טרה, הרדוף, יטבתה
+def find_food_item(data, food_item):
+    # Example: חלב 3% שומן, תנובה, טרה, הרדוף, יטבתה
     all_food_names = data['shmmitzrach'].squeeze()
     food_found = False
     if food_item in all_food_names.values:
@@ -80,7 +82,7 @@ def find_food_item(data):
     return food_item
 
 
-def content_base_recommender():
+def content_base_recommender(food_item):
     data = preprocess_data()
     tfidf = TfidfVectorizer(tokenizer=tokenize)
     tfidf_matrix = tfidf.fit_transform(data['shmmitzrach'])
@@ -88,22 +90,9 @@ def content_base_recommender():
     cosine_sim_macros = cosine_similarity(data[MACRO_NUTRIENTS])
     cosine_sim_nutri = cosine_similarity(data[MACRO_NUTRIENTS+MICRO_NUTRIENTS])
     indices = pd.Series(data.index, index=data['shmmitzrach']).drop_duplicates()
-    food_item = find_food_item(data)
-
-    print("----------first recommendations---------------")
-    first_recommendation = get_recommendations(data, food_item, cosine_sim_names, indices)
-    print(first_recommendation)
-    # recommneder_wordcloud(food_item, first_recommendation)
-
-    print("---------second recommendations----------")
-    second_recommendation = get_recommendations(data, food_item, cosine_sim_macros, indices)
-    print(second_recommendation)
-    # recommneder_wordcloud(food_item, second_recommendation)
-
-    print("---------third recommendations----------")
-    third_recommendation = get_recommendations(data, food_item, cosine_sim_nutri, indices)
-    print(third_recommendation)
-    # recommneder_wordcloud(food_item, third_recommendation)
+    foods_items = find_food_item(data, food_item)
+    return get_recommendations(data, foods_items, cosine_sim_names, indices), get_recommendations(data, foods_items, cosine_sim_macros, indices), get_recommendations(data, foods_items, cosine_sim_nutri, indices)
+    
 
 
 if __name__ == '__main__':
