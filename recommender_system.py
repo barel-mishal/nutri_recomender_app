@@ -1,12 +1,11 @@
-from ctypes import Union
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 from sklearn.metrics.pairwise import cosine_similarity
 import hebrew_tokenizer as ht
-from wordcloud import WordCloud
-from bidi.algorithm import get_display  # pip install python-bidi
+# from wordcloud import WordCloud
+# from bidi.algorithm import get_display  # pip install python-bidi
 from typing import Union
 
 ISRAELI_DATA_PATH = "csvs/israeli_data.csv"
