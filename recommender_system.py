@@ -1,4 +1,5 @@
 # import matplotlib.pyplot as plt
+import os
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
@@ -8,7 +9,9 @@ import hebrew_tokenizer as ht
 # from bidi.algorithm import get_display  # pip install python-bidi
 from typing import Union
 
-ISRAELI_DATA_PATH = "csvs/israeli_data.csv"
+__DIRNAME__ = os.path.dirname(os.path.realpath(__file__))
+
+ISRAELI_DATA_PATH = os.path.join(__DIRNAME__, 'csvs', "israeli_data.csv")
 MACRO_NUTRIENTS = ['protein', 'total_fat', 'carbohydrates']
 MICRO_MINERALS = ['calcium', 'iron', 'magnesium', 'phosphorus', 'potassium', 'sodium', 'zinc', 'copper']
 MICRO_VITAMINS = ['vitamin_a_iu', 'vitamin_e', 'vitamin_c', 'thiamin', 'riboflavin', 'niacin', 'vitamin_b6',
@@ -49,17 +52,6 @@ def get_recommendations(data, food_item, cosine_sim, indices) -> pd.Series:
 
     # Return the top 10 most similar food items
     return data['shmmitzrach'].iloc[foods_indices]
-
-
-# def recommneder_wordcloud(food_item, recommendations):
-#     text = food_item
-#     for recommended in recommendations:
-#         text += " " + recommended
-#     bidi_text = get_display(text)
-#     wordcloud = WordCloud(font_path='C:\Windows\Fonts\courbd.ttf').generate(bidi_text)
-#     plt.imshow(wordcloud, interpolation='bilinear')
-#     plt.axis("off")
-#     plt.show()
 
 
 def find_food_item(data, food_item):
